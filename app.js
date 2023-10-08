@@ -4,6 +4,7 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ exposedHeaders: ["X-Total-Count"] }));
 const errorMiddleware = require("./middlewares/error");
 
 //Routes
