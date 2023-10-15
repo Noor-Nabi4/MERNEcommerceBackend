@@ -1,19 +1,24 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const brandSchema = new Schema({
-  value: { type: String, required: true, unique: true },
-  label: { type: String, required: true, unique: true },
+const cartSchema = new Schema({
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  product:{type:Schema.Types.ObjectId,ref:"Product",required:true},
+  user:{type:Schema.Types.ObjectId,ref:"User",required:true},
+  
 });
-const virtual = brandSchema.virtual("id");
+const virtual = cartSchema.virtual("id");
 virtual.get(function () {
   return this._id;
 });
-brandSchema.set("toJSON", {
+cartSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: function (doc, ret) {
     delete ret._id;
   },
 });
-exports.Brand = mongoose.model("Brand", brandSchema);
+exports.Cart = mongoose.model("Cart", cartSchema);

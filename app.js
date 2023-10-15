@@ -11,13 +11,16 @@ const errorMiddleware = require("./middlewares/error");
 const ProductRoute = require("./routes/Product");
 const BrandRoute = require("./routes/Brand");
 const CategoryRoute = require("./routes/Category");
-// const user = require("./routes/userRoutes");
-// const order = require("./routes/orderRoutes");
+const UserRoute = require("./routes/User");
+const AuthRoute = require("./routes/Auth");
+const CartRoute = require("./routes/Cart");
 
-app.use("/product", ProductRoute);
-app.use("/brand", BrandRoute);
-app.use("/Category", CategoryRoute);
-// app.use("/", user);
+app.use("/products", ProductRoute);
+app.use("/brands", BrandRoute);
+app.use("/categories", CategoryRoute);
+app.use("/user", UserRoute);
+app.use("/auth", AuthRoute);
+app.use("/cart", CartRoute);
 // app.use("/", order);
 
 //middleware
