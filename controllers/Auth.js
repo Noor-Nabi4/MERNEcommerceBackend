@@ -2,6 +2,8 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const { User } = require("../models/User");
 const ErrorHanler = require("../utils/errorHandler");
 const sendToken = require("../utils/jWTToken");
+const sendEmail = require("../utils/sendEmail");
+const crypto = require("crypto");
 exports.createUser = catchAsyncErrors(async (req, res, next) => {
   let user = new User(req.body);
   user = await user.save();
@@ -31,4 +33,59 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "logout successfully",
   });
+});
+
+exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new ErrorHanler("user not found", 404));
+  }
+  const resetToken = user.setResetPasswordToken();
+  const resetPasswordUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/auth/password/reset/${resetToken}`;
+  await user.save({ validateBeforeSave: false });
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "ecommerce",
+      message: resetPasswordUrl,
+    });
+    res.json({
+      success: true,
+      message: "send",
+    });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorHanler(error.message, 500));
+  }
+});
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+  const {password,confirmPassword}= req.body;
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(
+      new ErrorHanler(
+        "reset password  token is invalid or has been expired",
+        400
+      )
+    );
+  }
+  if (password !== confirmPassword) {
+    new ErrorHanler("password does not match with confirm password", 400);
+  }
+  user.password = password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+  sendToken(user, 200, res);
 });
