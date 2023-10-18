@@ -2,7 +2,7 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const { Order } = require("../models/Order");
 
 exports.fetchOrdersByUser = catchAsyncErrors(async (req, res, next) => {
-  const {id} = req.params;
+  const {id} = req.user;
   const order = await Order.find({ user: id })
     .populate("user")
   res.json(order);

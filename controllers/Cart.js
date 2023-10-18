@@ -2,7 +2,8 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const { Cart } = require("../models/Cart");
 
 exports.fetchCartByUser = catchAsyncErrors(async (req, res, next) => {
-  const user = req.query.user;
+  const user = req.user;
+  console.log(user);
   const cartItems = await Cart.find({ user: user })
     .populate("user")
     .populate("product");

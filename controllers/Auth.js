@@ -4,6 +4,14 @@ const ErrorHanler = require("../utils/errorHandler");
 const sendToken = require("../utils/jWTToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+
+exports.CheckAuth = catchAsyncErrors(async (req, res, next) => {
+  if (req.user) {
+    res.json(req.user);
+  } else {
+    res.sendStatus(401);
+  }
+});
 exports.createUser = catchAsyncErrors(async (req, res, next) => {
   let user = new User(req.body);
   user = await user.save();
@@ -63,7 +71,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   }
 });
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
-  const {password,confirmPassword}= req.body;
+  const { password, confirmPassword } = req.body;
   const resetPasswordToken = crypto
     .createHash("sha256")
     .update(req.params.token)
