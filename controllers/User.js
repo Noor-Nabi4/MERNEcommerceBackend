@@ -7,7 +7,7 @@ exports.fetchUserById = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateUser = catchAsyncErrors(async (req, res, next) => {
-  const { id } = req.params;
+  const  id  = req.user._id;
   const user = await User.findByIdAndUpdate(id, req.body, { new: true });
   res.json(user);
 });
